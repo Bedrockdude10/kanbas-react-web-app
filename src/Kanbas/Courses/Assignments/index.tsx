@@ -1,7 +1,8 @@
-import React from 'react';
+import { useParams, useLocation } from "react-router";
 import LessonControlButtons from "../Modules/LessonControlButtons";
 import { BsGripVertical } from "react-icons/bs";
 import { FaSearch, FaPlus } from "react-icons/fa";
+import { assignments } from "../Database";
 
 interface AssignmentProps {
   name: string;
@@ -11,6 +12,8 @@ interface AssignmentProps {
 }
 
 export default function Assignments() {
+  const {cid}  = useParams()
+  const {pathname} = useLocation();
   return (
     <div id="wd-assignments" className="container">
       <div className="d-flex justify-content-between mb-3">
