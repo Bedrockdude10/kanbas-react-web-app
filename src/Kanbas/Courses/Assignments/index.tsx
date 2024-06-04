@@ -1,20 +1,15 @@
-import { useParams, useLocation } from "react-router";
+import React from 'react';
 import LessonControlButtons from "../Modules/LessonControlButtons";
 import { BsGripVertical } from "react-icons/bs";
 import { FaSearch, FaPlus } from "react-icons/fa";
-import {assignments} from "../../Database"
-
-interface AssignmentProps {
-  name: string;
-  link: string;
-  availability: string;
-  due: string;
-}
+import { useParams} from 'react-router';
+import { Link, useLocation } from "react-router-dom";
+import { assignments } from "../../Database"
 
 export default function Assignments() {
-  const {cid}  = useParams()
-  const course = courses.find((course) => course._id === cid);
-  const {pathname} = useLocation();
+  const { cid } = useParams();
+  const local_assignments = assignments.filter(assignment => assignment.course === cid);
+
   return (
     <div id="wd-assignments" className="container">
       <div className="d-flex justify-content-between mb-3">
@@ -39,9 +34,11 @@ export default function Assignments() {
             <button className="btn btn-light btn-sm float-end">Edit</button>
           </div>
           <ul id="wd-assignment-list" className="list-group rounded-0">
-            {renderAssignment("A1 - ENV + HTML", "#/Kanbas/Courses/1234/Assignments/123", "Multiple Modules | Not available until May 6 at 12:00am", "Due May 13 at 11:59pm | 100 pts")}
-            {renderAssignment("A2 - CSS + BOOTSTRAP", "#/Kanbas/Courses/1234/Assignments/2", "Multiple Modules | Not available until May 13 at 12:00am", "Due May 20 at 11:59pm | 100 pts")}
-            {renderAssignment("A3 - JAVASCRIPT + REACT", "#/Kanbas/Courses/1234/Assignments/3", "Multiple Modules | Not available until May 20 at 12:00am", "Due May 27 at 11:59pm | 100 pts")}
+            {local_assignments.map((assignment) => ( 
+              <Link to={`/Kanbas/Courses/${assignment.course}/Assignments/${assignment._id}`} className="text-decoration-none" >
+                {renderAssignment(assignment.title, "Multiple Modules | Not available until May 6 at 12:00am", "Due May 13 at 11:59pm | 100 pts")}
+              </Link>
+            ))}
           </ul>
         </li>
       </ul>
@@ -49,13 +46,12 @@ export default function Assignments() {
   );
 }
 
-function renderAssignment(name: string, link: string, availability: string, due: string) {
+function renderAssignment(name: string, availability: string, due: string) {
   return (
     <li className="wd-assignment-list-item list-group-item d-flex align-items-center" style={{borderLeft: '5px solid green'}}>
       <BsGripVertical className="fs-3 me-2" />
       <div className="flex-grow-1">
-        <a className="wd-assignment-link fs-5 fw-bold d-block"
-            href={link}>
+        <a className="wd-assignment-link fs-5 fw-bold d-block">
             {name}
         </a>
         <div>
