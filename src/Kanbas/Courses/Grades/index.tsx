@@ -1,6 +1,32 @@
 import { FaDownload, FaFileExport } from 'react-icons/fa';  // Updated icons
+import { grades, assignments, enrollments } from '../../Database';
+import { useParams } from "react-router-dom";
 
 export default function Grades() {
+  const {cid} = useParams()
+  const local_assignments = assignments.filter(assignment => assignment.course === cid);
+  const local_enrollments = enrollments.filter(enrollment => enrollment.course === cid);
+
+  let gradesMap: {
+    [studentId: string]: {
+        [assignmentId: string]: string;
+    };
+  } = {};
+  
+  grades.forEach((grade) => {
+    if (!gradesMap[grade.student]) {
+        gradesMap[grade.student] = {};
+    }
+    gradesMap[grade.student][grade.assignment] = grade.grade;
+  });
+
+  function getGrade(studentId: string, assignmentId: string): string | null {
+    if (gradesMap[studentId] && gradesMap[studentId][assignmentId]) {
+        return gradesMap[studentId][assignmentId];
+    }
+    return null; // Return null if the grade doesn't exist
+  }
+
   return (
     <div className="container mt-3">
       <div className="row mb-3">
@@ -29,22 +55,21 @@ export default function Grades() {
           <thead>
             <tr>
               <th>Student Name</th>
-              <th>A1 SETUP</th>
-              <th>A2 HTML</th>
-              <th>A3 CSS</th>
-              <th>A4 BOOTSTRAP</th>
+                {local_assignments.map(assignment => (
+                  <th>{assignment.title}</th>
+                ))}
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Jane Adams</td>
-              <td><input type="text" className="form-control" defaultValue="100%" /></td>
-              <td>96.67%</td>
-              <td>92.18%</td>
-              <td>66.22%</td>
-            </tr>
-            {/* Additional rows can be added as needed */}
-          </tbody>
+            {local_enrollments.map(enrollment => (
+              <tr key={enrollment._id}>
+                <td>{enrollment.user}</td>
+                {local_assignments.map(assignment => (
+                  <td>{getGrade(enrollment.user, assignment._id)}</td>
+                ))}
+              </tr>
+            ))}
+            </tbody>
         </table>
       </div>
     </div>
