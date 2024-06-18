@@ -5,6 +5,8 @@ import { Routes, Route, Navigate } from "react-router";
 import "./styles.css"
 import * as db from "./Database";
 import { useState } from "react";
+import store from "./store";
+import { Provider } from "react-redux";
 
 export default function Kanbas() {
   const [courses, setCourses] = useState<any[]>(db.courses);
@@ -30,27 +32,30 @@ export default function Kanbas() {
     );
   };
   return (
-    <div id="wd-kanbas" className="h-100">
-    <div className="d-flex h-100">
-      <div className="d-none d-md-block bg-black">
-        <KanbasNavigation />
+    <Provider store={store}>
+      <div id="wd-kanbas" className="h-100">
+      <div className="d-flex h-100">
+        <div className="d-none d-md-block bg-black">
+          <KanbasNavigation />
+        </div>
+        <div className="flex-fill p-4">
+          <Routes>
+            <Route path="/" element={<Navigate to="Dashboard" />} />
+            <Route path="Account" element={<h1>Account</h1>} />
+            <Route path="Dashboard" element={
+              <Dashboard
+                courses={courses}
+                course={course}
+                setCourse={setCourse}
+                addNewCourse={addNewCourse}
+                deleteCourse={deleteCourse}
+                updateCourse={updateCourse}/>
+            } />
+            <Route path="Courses/:cid/*" element={
+              <Courses courses={courses} />} />
+          </Routes>
+        </div>
       </div>
-      <div className="flex-fill p-4">
-        <Routes>
-          <Route path="/" element={<Navigate to="Dashboard" />} />
-          <Route path="Account" element={<h1>Account</h1>} />
-          <Route path="Dashboard" element={
-            <Dashboard
-              courses={courses}
-              course={course}
-              setCourse={setCourse}
-              addNewCourse={addNewCourse}
-              deleteCourse={deleteCourse}
-              updateCourse={updateCourse}/>
-          } />
-          <Route path="Courses/:cid/*" element={
-            <Courses courses={courses} />} />
-        </Routes>
       </div>
-    </div>
-    </div>);}
+    </Provider>
+    );}
