@@ -1,12 +1,6 @@
-// src/Kanbas/Courses/Assignments/Assignments/reducer.ts
 import { createSlice } from "@reduxjs/toolkit";
-import { assignments } from "../../Database"; // make sure the path is correct based on your project structure
-
-interface Assignment {
-  _id: string;
-  title: string;
-  course: string;
-}
+import { assignments } from "../../Database"; // Adjust path as needed
+import Assignment from "./types";
 
 const initialState = {
   assignments: assignments as Assignment[],
@@ -20,21 +14,28 @@ const assignmentsSlice = createSlice({
       const newAssignment: Assignment = {
         _id: new Date().getTime().toString(),
         title: assignment.title,
+        description: assignment.description,
         course: assignment.course,
+        points: assignment.points,
+        dueDate: assignment.dueDate,
+        availableFromDate: assignment.availableFromDate,
+        availableUntilDate: assignment.availableUntilDate,
+        displayGradeAs: assignment.displayGradeAs,
+        group: assignment.group,
+        submissionType: assignment.submissionType
       };
       state.assignments = [...state.assignments, newAssignment];
     },
     deleteAssignment: (state, { payload: assignmentId }) => {
       state.assignments = state.assignments.filter(
-        (assignment) => assignment._id !== assignmentId
+        assignment => assignment._id !== assignmentId
       );
     },
     updateAssignment: (state, { payload: updatedAssignment }) => {
       state.assignments = state.assignments.map((assignment) =>
-        assignment._id === updatedAssignment._id ? updatedAssignment : assignment
+        assignment._id === updatedAssignment._id ? {...assignment, ...updatedAssignment} : assignment
       );
     },
-    // This function toggles the editing state of an assignment
     editAssignment: (state, { payload: assignmentId }) => {
       state.assignments = state.assignments.map((assignment) =>
         assignment._id === assignmentId ? { ...assignment, editing: true } : assignment
@@ -43,7 +44,6 @@ const assignmentsSlice = createSlice({
   },
 });
 
-export const { addAssignment, deleteAssignment, updateAssignment, editAssignment } =
-  assignmentsSlice.actions;
+export const { addAssignment, deleteAssignment, updateAssignment, editAssignment } = assignmentsSlice.actions;
 
 export default assignmentsSlice.reducer;

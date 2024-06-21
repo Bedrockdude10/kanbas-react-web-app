@@ -6,12 +6,12 @@ import { BsGripVertical } from "react-icons/bs";
 import { useParams } from "react-router";
 import { addModule, editModule, updateModule, deleteModule } from "./reducer";
 import { useSelector, useDispatch } from "react-redux";
-
+import { RootState } from "../../store";
 
 export default function Modules() {
   const { cid } = useParams();
   const [moduleName, setModuleName] = useState("");
-  const { modules } = useSelector((state: any) => state.modulesReducer);
+  const modules = useSelector((state: RootState) => state.modules.modules);
   const dispatch = useDispatch();
 
   return (
@@ -22,6 +22,7 @@ export default function Modules() {
         addModule={() => {
           dispatch(addModule({ name: moduleName, course: cid }));
           setModuleName("");
+          console.log("added module")
         }}
       />
       <ul id="wd-modules" style={{ 
