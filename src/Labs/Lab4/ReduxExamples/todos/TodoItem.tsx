@@ -1,7 +1,21 @@
+// Define the structure of a todo item
+interface Todo {
+  id: number;
+  title: string;
+}
+
+// Use the Todo type for the component's props
+interface TodoItemProps {
+  todo: Todo;
+}
+
 import { useDispatch } from "react-redux";
 import { deleteTodo, setTodo } from "./todosReducer";
-export default function TodoItem({todo}) {
+
+// Apply the TodoItemProps interface to the component function
+const TodoItem: React.FC<TodoItemProps> = ({ todo }) => {
   const dispatch = useDispatch();
+
   return (
     <li key={todo.id} className="list-group-item">
       <button onClick={() => dispatch(deleteTodo(todo.id))}
@@ -12,3 +26,5 @@ export default function TodoItem({todo}) {
     </li>
   );
 }
+
+export default TodoItem;
