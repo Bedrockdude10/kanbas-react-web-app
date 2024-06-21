@@ -1,3 +1,6 @@
+import { useDispatch } from "react-redux";
+import { deleteTodo, setTodo } from "./todosReducer";
+
 // Define the structure of a todo item
 interface Todo {
   id: number;
@@ -8,9 +11,6 @@ interface Todo {
 interface TodoItemProps {
   todo: Todo;
 }
-
-import { useDispatch } from "react-redux";
-import { deleteTodo, setTodo } from "./todosReducer";
 
 // Apply the TodoItemProps interface to the component function
 const TodoItem: React.FC<TodoItemProps> = ({ todo }) => {
