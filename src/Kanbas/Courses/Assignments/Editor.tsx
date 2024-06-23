@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateAssignment, addAssignment } from './reducer';
 import Assignment from './types';
+import * as client from "./client";
 
 interface RootState {
   assignments: {
@@ -56,17 +57,22 @@ export default function AssignmentEditor() {
     }));
 };
 
+const createAssignment = async (assignment: any) => {
+  const newAssignment = await client.createAssignment(cid as string, assignment);
+  dispatch(addAssignment(newAssignment));
+};  
 
+const saveAssignment = async (assignment: any) => {
+  const status = await client.updateAssignment(assignment);
+  dispatch(updateAssignment(assignment));
+};
 
 const handleSave = () => {
   if (currentAssignment._id) {
-    dispatch(updateAssignment(currentAssignment));
+    saveAssignment(currentAssignment);
   } else {
-    const newAssignment = {
-      ...currentAssignment,
-      _id: new Date().getTime().toString()
-    };
-    dispatch(addAssignment(newAssignment));
+    // create blank assignment
+    createAssignment({});
   }
   navigate(`/Kanbas/Courses/${cid}/Assignments`);
 };
