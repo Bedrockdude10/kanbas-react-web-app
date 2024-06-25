@@ -29,6 +29,7 @@ export default function Modules() {
   const fetchModules = async () => {
     const modules = await client.findModulesForCourse(cid as string);
     dispatch(setModules(modules));
+    console.log(modules);
   };
   useEffect(() => {
     fetchModules();

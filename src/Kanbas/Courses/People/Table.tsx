@@ -30,6 +30,7 @@ export default function PeopleTable() {
   const fetchUsers = async () => {
     const users = await client.findAllUsers();
     setUsers(users);
+    console.log(users);
   };
 
   useEffect(() => {
@@ -72,13 +73,20 @@ export default function PeopleTable() {
           </tr>
         </thead>
         <tbody>
-          {users.map((user: any) => (
-            <tr key={user._id} >
-              <td className="text-nowrap"> {user.firstName} {user.lastName} </td>
-              <td>{user.loginId}</td><td>{user.section}</td><td>{user.role}</td><td>{user.lastActivity}</td>
-              <td>{user.totalActivity}</td>
-            </tr>
-          ))}
+        {users.map((user: any) => {
+            // console.log(`User object: ${user}`)
+            // console.log(`Rendering user with ID: ${user._id}`);
+            return (
+                <tr key={user._id}>
+                <td className="text-nowrap">{user.firstName} {user.lastName}</td>
+                <td>{user.loginId}</td>
+                <td>{user.section}</td>
+                <td>{user.role}</td>
+                <td>{user.lastActivity}</td>
+                <td>{user.totalActivity}</td>
+                </tr>
+            );
+            })}
         </tbody>
       </table>
       <PeopleDetails fetchUsers={fetchUsers} />
