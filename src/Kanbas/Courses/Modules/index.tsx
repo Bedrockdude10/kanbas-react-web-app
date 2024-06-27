@@ -15,21 +15,29 @@ export default function Modules() {
   const modules = useSelector((state: RootState) => state.modules.modules);
   const dispatch = useDispatch();
   const saveModule = async (module: any) => {
-    const status = await client.updateModule(module);
-    dispatch(updateModule(module));
+    console.log('Saving module:', module); // Log module details
+    try {
+      const status = await client.updateModule(module);
+      console.log('Module updated:', status);
+      dispatch(updateModule(module));
+    } catch (error) {
+      console.error('Failed to update module:', error);
+    }
   };
   const removeModule = async (moduleId: string) => {
     await client.deleteModule(moduleId);
     dispatch(deleteModule(moduleId));
   };
   const createModule = async (module: any) => {
+    if (!module._id) {
+      module._id = "M104";
+    }
     const newModule = await client.createModule(cid as string, module);
     dispatch(addModule(newModule));
   };
   const fetchModules = async () => {
     const modules = await client.findModulesForCourse(cid as string);
     dispatch(setModules(modules));
-    console.log(modules);
   };
   useEffect(() => {
     fetchModules();
@@ -59,10 +67,16 @@ export default function Modules() {
             ) : (
               <input 
                 className="form-control w-50 d-inline-block"
-                onChange={(e) => saveModule({ ...module, name: e.target.value }) }
+                onChange={(e) => {
+                  const updatedModule = { ...module, name: e.target.value };
+                  console.log('onChange module:', updatedModule);
+                  saveModule(updatedModule);
+                }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
-                    saveModule({ ...module, editing: false });
+                    const updatedModule = { ...module, editing: false };
+                    console.log('onKeyDown module:', updatedModule);
+                    dispatch(updateModule(updatedModule)); // Only update the local state
                   }
                 }}
                 value={module.name}
