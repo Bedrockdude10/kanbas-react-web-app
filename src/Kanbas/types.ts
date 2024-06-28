@@ -38,3 +38,22 @@ export interface Question {
     quizzes: Quiz[];
   }
   
+  export type NewQuiz = Omit<Quiz, "_id">;
+  
+  export interface Choice {
+    text: string;
+    isCorrect: boolean;
+  }
+  
+  export interface Question {
+    _id: string;
+    title: string;
+    points: number;
+    questionType: 'multipleChoice' | 'trueFalse' | 'fillInBlanks';
+    questionText: string;
+    choices?: Choice[]; // For multipleChoice questions
+    correctAnswers?: string[]; // For fillInBlanks questions
+    correctAnswer?: boolean; // For trueFalse questions
+  }
+
+  export type NewQuestion = Omit<Question, "_id">;
