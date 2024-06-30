@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
 import * as client from "./client";
-import { setQuizzes, addQuiz, deleteQuiz, updateQuiz, editQuiz } from "./reducer";
+import { setQuizzes, addQuiz, deleteQuiz, updateQuiz } from "./reducer";
 import { Quiz, NewQuiz } from "../../types"; // Ensure NewQuiz is imported from types
 import { BsGripVertical, BsThreeDotsVertical } from "react-icons/bs";
 import { FaPlus, FaTrash, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
@@ -92,6 +92,15 @@ export default function Quizzes() {
     setCurrentQuiz(null);
   };
 
+  const sortedQuizzes = [...quizzes]
+    .filter((quiz: Quiz) => quiz.course === cid)
+    .sort((a, b) => {
+      if (!a.availableDate && !b.availableDate) return 0;
+      if (!a.availableDate) return 1;
+      if (!b.availableDate) return -1;
+      return new Date(a.availableDate).getTime() - new Date(b.availableDate).getTime();
+    });
+
   return (
     <div className="container">
       <div className="d-flex justify-content-between mb-3">
@@ -110,7 +119,7 @@ export default function Quizzes() {
         <div className="alert alert-info">No quizzes found. Click + Quiz to add a new quiz.</div>
       ) : (
         <ul className="list-group rounded-0">
-          {quizzes.filter((quiz: Quiz) => quiz.course === cid).map((quiz: Quiz) => (
+          {sortedQuizzes.map((quiz: Quiz) => (
             <li key={quiz._id} className="list-group-item d-flex align-items-center">
               <BsGripVertical className="fs-3 me-2" />
               <div className="flex-grow-1" onClick={() => navigate(`/Kanbas/Courses/${quiz.course}/Quizzes/${quiz._id}`)} style={{ cursor: 'pointer' }}>

@@ -3,23 +3,24 @@ import { Question, NewQuestion, Choice } from '../../types';
 
 interface MultipleChoiceEditorProps {
   question: Question | NewQuestion;
-  handleChange: (updatedQuestion: Question) => void;
+  handleChange: (updatedQuestion: Question | NewQuestion) => void;
 }
 
 const MultipleChoiceEditor: React.FC<MultipleChoiceEditorProps> = ({ question, handleChange }) => {
-  const [localQuestion, setLocalQuestion] = useState<any>(question);
+  const [localQuestion, setLocalQuestion] = useState<Question | NewQuestion>(question);
   const [choices, setChoices] = useState<Choice[]>(question.choices ? [...question.choices] : []);
 
   useEffect(() => {
     setLocalQuestion(question);
+    setChoices(question.choices ? [...question.choices] : []);
   }, [question]);
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>, index: number) => {
     const updatedChoices = choices.map((choice, i) =>
       i === index ? { ...choice, text: e.target.value } : choice
     );
-    setLocalQuestion({ ...localQuestion, choices: updatedChoices });
     setChoices(updatedChoices);
+    setLocalQuestion({ ...localQuestion, choices: updatedChoices });
   };
 
   const handleRadioChange = (index: number) => {
@@ -27,13 +28,14 @@ const MultipleChoiceEditor: React.FC<MultipleChoiceEditorProps> = ({ question, h
       ...choice,
       isCorrect: i === index,
     }));
+    setChoices(updatedChoices);
     setLocalQuestion({ ...localQuestion, choices: updatedChoices });
   };
 
   const handleAddChoice = () => {
     const updatedChoices = [...choices, { text: '', isCorrect: false }];
-    setLocalQuestion({ ...localQuestion, choices: updatedChoices });
     setChoices(updatedChoices);
+    setLocalQuestion({ ...localQuestion, choices: updatedChoices });
   };
 
   const handleSave = () => {

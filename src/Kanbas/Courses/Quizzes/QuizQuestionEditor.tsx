@@ -99,7 +99,7 @@ const QuizQuestionEditor = () => {
     }
   };
 
-  const handleMultipleChoiceChange = (updatedQuestion: Question) => {
+  const handleMultipleChoiceChange = (updatedQuestion: any) => {
     const updatedQuestions = questions.map(q => q._id === updatedQuestion._id ? updatedQuestion : q);
     setQuestions(updatedQuestions);
   };

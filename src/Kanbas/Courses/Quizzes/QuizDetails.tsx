@@ -24,19 +24,32 @@ export default function QuizDetails() {
     };
 
     fetchQuiz();
-  }, []);
+  }, [qid]);
+
+  const handlePreview = () => {
+    navigate(`/Kanbas/Courses/${cid}/Quizzes/${quiz?._id}/Preview`);
+  };
+
+  const handleEdit = () => {
+    navigate(`/Kanbas/Courses/${cid}/Quizzes/${quiz?._id}/Edit`);
+  };
+
+  const handlePublish = async () => {
+    if (quiz) {
+      const updatedQuiz = { ...quiz, published: !quiz.published };
+      try {
+        await client.updateQuiz(updatedQuiz);
+        dispatch(updateQuiz(updatedQuiz));
+        setQuiz(updatedQuiz);
+      } catch (error) {
+        console.error('Error updating quiz:', error);
+      }
+    }
+  };
 
   if (!quiz) {
     return <div>Loading...</div>;
   }
-
-  const handlePreview = () => {
-    navigate(`/Kanbas/Courses/${cid}/Quizzes/${quiz._id}/Preview`);
-  };
-
-  const handleEdit = () => {
-    navigate(`/Kanbas/Courses/${cid}/Quizzes/${quiz._id}/Edit`);
-  };
 
   return (
     <div className="container">
@@ -95,6 +108,12 @@ export default function QuizDetails() {
           </button>
           <button className="btn btn-secondary ms-2" onClick={handleEdit}>
             Edit
+          </button>
+          <button
+            className={`btn ms-2 ${quiz.published ? 'btn-warning' : 'btn-success'}`}
+            onClick={handlePublish}
+          >
+            {quiz.published ? 'Unpublish' : 'Publish'}
           </button>
         </div>
       </div>
