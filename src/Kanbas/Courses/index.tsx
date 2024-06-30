@@ -8,6 +8,7 @@ import PeopleTable from "./People/Table";
 import Quizzes from "./Quizzes";
 import QuizDetails from "./Quizzes/QuizDetails";
 import QuizEditor from "./Quizzes/QuizEditor";
+import QuizPreview from "./Quizzes/QuizPreview";
 import { Navigate, Route, Routes, useParams, useLocation } from "react-router";
 import { FaAlignJustify } from "react-icons/fa";
 export default function Courses({ courses }: { courses: any[]; }) {
@@ -35,6 +36,7 @@ export default function Courses({ courses }: { courses: any[]; }) {
             <Route path="Quizzes" element={<Quizzes/>} />
             <Route path="Quizzes/:qid" element={<QuizDetails/>} />
             <Route path="Quizzes/:qid/Edit" element={<QuizEditor/>} />
+            <Route path="Quizzes/:qid/Preview" element={<QuizPreview/>} />
             <Route path="/Grades" element={<Grades />} />
             <Route path="People" element={<PeopleTable />} />
             <Route path="People/:uid" element={<PeopleTable />} />
