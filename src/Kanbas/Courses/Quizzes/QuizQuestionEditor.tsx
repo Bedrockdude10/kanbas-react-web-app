@@ -114,7 +114,7 @@ const QuizQuestionEditor = () => {
     setQuestions(updatedQuestions);
   };
 
-  const renderQuestionEditor = (question: Question | NewQuestion) => {
+  const renderQuestionEditor = (question: any) => {
     switch (question.questionType) {
       case 'multipleChoice':
         return <MultipleChoiceEditor question={question} handleChange={handleMultipleChoiceChange} />;
