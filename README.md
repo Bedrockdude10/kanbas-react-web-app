@@ -2,14 +2,14 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+# Make sure to start the Node.js server before starting the web app. Source can be found here:\
+[Node.js Server](https://github.com/Bedrockdude10/kanbas-node-server-app)
+
 ## Available Scripts
 
 In the project directory, you can run:
 
 ### `npm start`
-
-Make sure to start the Node.js server before starting the web app. Source can be found here:\
-[Node.js Server](https://github.com/Bedrockdude10/kanbas-node-server-app)
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
