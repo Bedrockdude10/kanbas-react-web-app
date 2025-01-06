@@ -1,127 +1,181 @@
+import React, {ChangeEvent} from 'react';
+import { useParams, useNavigate } from 'react-router';
+import { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateAssignment, addAssignment } from './reducer';
+import Assignment from './types';
+import * as client from "./client";
+
+interface RootState {
+  assignments: {
+    assignments: Assignment[];
+  };
+}
+
 export default function AssignmentEditor() {
-    return (
-      <div id="wd-assignments-editor">
-        <label htmlFor="wd-name">Assignment Name</label>
-        <input id="wd-name" value="A1 - ENV + HTML" />
-        <br /><br />
-        <textarea id="wd-description">
-          The assignment is available online
-          Submit a link to the landing page of
-        </textarea>
-        <br />
-        <table>
-            <tr>
-                <td align="right" valign="top">
-                    <label htmlFor="wd-points">Points</label>
-                </td>
-                <td>
-                    <input id="wd-points" value={100} />
-                </td>
-            </tr>
-            <tr>
-                <td align="right" valign="top">
-                    <label htmlFor="wd-group">Assignment Group</label>
-                </td>
-                <td>
-                    <select id="wd-group" value={"ASSIGNMENTS"}>
-                    <option value={"ASSIGNMENTS"}>ASSIGNMENTS</option>
-                    <option value={"QUIZZES"}>QUIZZES</option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td align="right" valign="top">
-                    <label htmlFor="wd-display-grade-as">Display Grade as</label>
-                </td>
-                <td>
-                    <select id="wd-display-grade-as" value={"Percentage"}>
-                    <option value={"Percentage"}>Percentage</option>
-                    <option value={"Letter"}>Letter</option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td align="right" valign="top">
-                    <label htmlFor="wd-submission-type">Submission Type</label>
-                </td>
-                <td>
-                    <select id="wd-submission-type" value={"Online"}>
-                    <option value={"Online"}>Online</option>
-                    <option value={"Paper"}>Paper</option>
-                    </select>
-                </td>
-            </tr>
-            <tr> 
-                <td>
-                    <label>Online Entry Options</label>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input type="checkbox" id="wd-text-entry"/>
-                    <label htmlFor="wd-text-entry">Text Entry</label>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input type="checkbox" id="wd-website-url"/>
-                    <label htmlFor="wd-website-url">Website URL</label>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input type="checkbox" id="wd-media-recordings"/>
-                    <label htmlFor="wd-media-recordings">Media Recordings</label>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input type="checkbox" id="wd-student-annotation"/>
-                    <label htmlFor="wd-student-annotation">Student Annotation</label>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input type="checkbox" id="wd-file-upload"/>
-                    <label htmlFor="wd-file-upload">File Upload</label>
-                </td>
-            </tr>
-            <tr> 
-                <td> 
-                    <label htmlFor="wd-assign-to">Assign to</label>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <select id="wd-assign-to" value={"Everyone"}>
-                        <option value={"Everyone"}>Everyone</option>
-                        <option value={"Your Mom"}>Your Mom</option>
-                    </select>
-                </td>
-            </tr>
-            <tr> 
-                <td> 
-                    <label htmlFor="wd-due-date">Due</label>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input type="date" id="wd-due-date" />
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <label htmlFor="wd-available-from" style={{ marginRight: '20px' }}>Available from</label>
-                    <label htmlFor="wd-available-until">Until</label>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input type="date" id="wd-available-from" />
-                    <input type="date" id="wd-available-until" />
-                </td>
-            </tr>
-        </table>
+  const { aid, cid } = useParams<{ aid?: string; cid: string }>();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  // Fetching the assignment from Redux state
+  const assignment = useSelector((state: RootState) => 
+    state.assignments.assignments.find(a => a._id === aid)
+  );
+
+  // Initialize local state with fetched assignment or default values
+  const [currentAssignment, setCurrentAssignment] = useState<Assignment>(() => {
+    return assignment || {
+      _id: '',
+      title: '',
+      description: '',
+      course: cid || 'default_cid',
+      points: 0,
+      dueDate: '',
+      availableFromDate: '',
+      availableUntilDate: '',
+      displayGradeAs: '',
+      group: '',
+      submissionType: ''
+    };
+  });
+
+  useEffect(() => {
+    if (assignment) {
+      setCurrentAssignment(assignment);
+    }
+  }, [assignment]);
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const target = event.target;
+    const isCheckbox = target instanceof HTMLInputElement && target.type === 'checkbox';
+    const value = isCheckbox ? target.checked : target.value;
+    const name = target.name;
+
+    setCurrentAssignment(prevState => ({
+        ...prevState,
+        [name]: value
+    }));
+};
+
+const createAssignment = async (assignment: any) => {
+  const newAssignment = await client.createAssignment(cid as string, assignment);
+  dispatch(addAssignment(newAssignment));
+};  
+
+const saveAssignment = async (assignment: any) => {
+  const status = await client.updateAssignment(assignment);
+  dispatch(updateAssignment(assignment));
+};
+
+const handleSave = () => {
+  if (currentAssignment._id) {
+    saveAssignment(currentAssignment);
+  } else {
+    // create blank assignment
+    createAssignment({});
+  }
+  navigate(`/Kanbas/Courses/${cid}/Assignments`);
+};
+
+  const handleCancel = () => {
+    navigate(`/Kanbas/Courses/${cid}/Assignments`);
+    };
+
+  return (
+    <div id="wd-assignments-editor" className="container mt-3">
+      <div className="row mb-3">
+        <div className="col">
+          <label htmlFor="wd-name" className="form-label">Assignment Name</label>
+          <input id="wd-name" name='title' className="form-control" value={currentAssignment.title} onChange={handleInputChange} />
+        </div>
       </div>
-  );}
-  
+      <div className="row mb-3">
+        <div className="col">
+          <label htmlFor="wd-description" className="form-label">Description</label>
+          <textarea id="wd-description" className="form-control" name='description' value={currentAssignment.description} defaultValue="The assignment is available online. Submit a link to the landing page of" onChange={handleInputChange}/>
+        </div>
+      </div>
+      <div className="row mb-3">
+        <div className="col-6">
+          <label htmlFor="wd-points" className="form-label">Points</label>
+          <input id="wd-points" className="form-control" type="number" name="points" value={currentAssignment.points} onChange={handleInputChange}/>
+        </div>
+        <div className="col-6">
+          <label htmlFor="wd-group" className="form-label">Assignment Group</label>
+          <select id="wd-group" className="form-select" name="group" value={currentAssignment.group} onChange={handleInputChange}>
+            <option value="ASSIGNMENTS">ASSIGNMENTS</option>
+            <option value="QUIZZES">QUIZZES</option>
+          </select>
+        </div>
+      </div>
+      <div className="row mb-3">
+        <div className="col-6">
+          <label htmlFor="wd-display-grade-as" className="form-label">Display Grade as</label>
+          <select id="wd-display-grade-as" className="form-select" name="displayGradeAs" value={currentAssignment.displayGradeAs} onChange={handleInputChange}>
+            <option value="Percentage">Percentage</option>
+            <option value="Letter">Letter</option>
+          </select>
+        </div>
+        <div className="col-6">
+          <label htmlFor="wd-submission-type" className="form-label">Submission Type</label>
+          <select id="wd-submission-type" className="form-select" name="submissionType" value={currentAssignment.submissionType} onChange={handleInputChange}>
+            <option value="Online">Online</option>
+            <option value="Paper">Paper</option>
+          </select>
+        </div>
+      </div>
+      <div className="row mb-3">
+        <div className="col">
+          <label className="form-label">Online Entry Options</label>
+          <div className="form-check">
+            <input type="checkbox" id="wd-text-entry" className="form-check-input" onChange={handleInputChange}/>
+            <label htmlFor="wd-text-entry" className="form-check-label">Text Entry</label>
+          </div>
+          <div className="form-check">
+            <input type="checkbox" id="wd-website-url" className="form-check-input" onChange={handleInputChange}/>
+            <label htmlFor="wd-website-url" className="form-check-label">Website URL</label>
+          </div>
+          <div className="form-check">
+            <input type="checkbox" id="wd-media-recordings" className="form-check-input" onChange={handleInputChange}/>
+            <label htmlFor="wd-media-recordings" className="form-check-label">Media Recordings</label>
+          </div>
+          <div className="form-check">
+            <input type="checkbox" id="wd-student-annotation" className="form-check-input" onChange={handleInputChange}/>
+            <label htmlFor="wd-student-annotation" className="form-check-label">Student Annotation</label>
+          </div>
+          <div className="form-check">
+            <input type="checkbox" id="wd-file-upload" className="form-check-input" onChange={handleInputChange}/>
+            <label htmlFor="wd-file-upload" className="form-check-label">File Upload</label>
+          </div>
+        </div>
+      </div>
+      <div className="row mb-3">
+        <div className="col-6">
+          <label htmlFor="wd-assign-to" className="form-label">Assign to</label>
+          <select id="wd-assign-to" className="form-select" defaultValue="Everyone" onChange={handleInputChange}>
+            <option value="Everyone">Everyone</option>
+            <option value="Your Mom">Your Mom</option>
+          </select>
+        </div>
+        <div className="col-6">
+          <label htmlFor="wd-due-date" className="form-label">Due Date</label>
+          <input type="date" id="wd-due-date" className="form-control" name="dueDate" value={currentAssignment.dueDate} onChange={handleInputChange}/>
+        </div>
+      </div>
+      <div className="row mb-3">
+        <div className="col-6">
+          <label htmlFor="wd-available-from" className="form-label">Available From</label>
+          <input type="date" id="wd-available-from" className="form-control" name="availableFromDate" value={currentAssignment.availableFromDate} onChange={handleInputChange}/>
+        </div>
+        <div className="col-6">
+          <label htmlFor="wd-available-until" className="form-label">Available Until</label>
+          <input type="date" id="wd-available-until" className="form-control" name="availableUntilDate" value={currentAssignment.availableUntilDate} onChange={handleInputChange}/>
+        </div>
+      </div>
+      <div className="col mb-3 text-end">
+          <button onClick={handleCancel} className="btn" style={{ backgroundColor: 'white', color: 'black', border: '1px solid #ccc' }}>Cancel</button>
+          <button onClick={handleSave} className="btn" style={{ backgroundColor: 'red', color: 'white' }}>Save</button>
+      </div>
+    </div>
+  );
+}
